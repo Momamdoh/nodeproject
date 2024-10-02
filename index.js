@@ -7,6 +7,7 @@ const path = require("path");
 const cors = require("cors");
 
 
+
 // Import custom middlewares and utilities
 const logger = require("./middlewares/logger");
 const { notfound, errors } = require("./middlewares/errors");
@@ -14,6 +15,12 @@ const { ConnectToDb } = require("./config/db");
 
 // Create an instance of the Express application
 const app = express();
+
+// Set the view engine to EJS
+app.set("view engine", "ejs");
+
+// Set the views directory if it's not in the default location
+app.set("views", path.join(__dirname, "views")); // Adjust the path as needed
 
 // Connect to MongoDB
 ConnectToDb();
@@ -39,7 +46,7 @@ app.use("/pass", require("./routes/password"));
 
 // Base route
 app.use("/", (req, res) => {
-  res.json("Welcome To NodeJs!");
+  res.json("Welcome");
 });
 
 // Error handling for routes not found
