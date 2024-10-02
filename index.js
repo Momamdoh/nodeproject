@@ -1,0 +1,56 @@
+// Load environment variables
+require("dotenv").config();
+
+// Import necessary packages
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
+
+
+// Import custom middlewares and utilities
+const logger = require("./middlewares/logger");
+const { notfound, errors } = require("./middlewares/errors");
+const { ConnectToDb } = require("./config/db");
+
+// Create an instance of the Express application
+const app = express();
+
+// Connect to MongoDB
+ConnectToDb();
+
+// Middleware
+app.use(cors()); // Add your CORS middleware here
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(logger); // Custom logger middleware
+
+// Static file serving
+app.use(express.static(path.join(__dirname, 'public/images')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
+
+// Routes
+app.use("/book", require("./routes/books"));
+app.use("/author", require("./routes/authors"));
+app.use("/auth", require("./routes/auth"));
+app.use("/Img", require("./routes/upload"));
+app.use("/user", require("./routes/users"));
+app.use("/pass", require("./routes/password"));
+
+// Base route
+app.use("/", (req, res) => {
+  res.json("Welcome To NodeJs!");
+});
+
+// Error handling for routes not found
+app.use(notfound);
+
+// Global error handler
+app.use(errors);
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
